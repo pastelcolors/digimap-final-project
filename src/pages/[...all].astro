@@ -1,0 +1,7 @@
+---
+import { handleRequest } from 'thaler/server';
+const result = await handleRequest(Astro.request);
+if (result) {
+  return result;
+}
+---
