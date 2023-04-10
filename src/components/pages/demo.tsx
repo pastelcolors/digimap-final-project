@@ -1,10 +1,11 @@
-import { JSX, createEffect, createResource, createSignal, onCleanup } from 'solid-js';
+import { JSX, Show, Suspense, createEffect, createResource, createSignal, onCleanup } from 'solid-js';
 import { fn$ } from 'thaler';
 
 export default function Demo(): JSX.Element {
   const [imageBuffer, setImageBuffer] = createSignal<File | null>(null);
   const [imagePreview, setImagePreview] = createSignal<string | undefined>();
   const [imageProcessedPreview, setImageProcessedPreview] = createSignal<string | undefined>();
+  const [isProcessing, setIsProcessing] = createSignal(false);
 
   const processImage = fn$<File, Uint8Array | undefined>(async (buffer) => {
     const { segment } = await import('../../utils/process');
@@ -18,7 +19,13 @@ export default function Demo(): JSX.Element {
     }
   });
 
-  const [data] = createResource(imageBuffer, (value) => processImage(value));
+  const [data] = createResource(imageBuffer, async (value) => {
+    setIsProcessing(true);
+    const img = await processImage(value);
+    setIsProcessing(false);
+
+    return img;
+  });
 
   const handleImageUpload = (event: Event) => {
     const file = (event.target as HTMLInputElement).files?.[0];
@@ -84,15 +91,20 @@ export default function Demo(): JSX.Element {
                   alt="Uploaded image preview"
                 />
               </div>
-              <div
-                class={imageProcessedPreview() ? 'block' : 'hidden'}
+              <Show
+                when={isProcessing()}
               >
-                <h2>Processed Image:</h2>
-                <img
-                  src={imageProcessedPreview()}
-                  alt="Processed image preview"
-                />
-              </div>
+                <div>Processing image...</div>
+              </Show>
+              <div
+                  class={imageProcessedPreview() ? 'block' : 'hidden'}
+                >
+                  <h2>Processed Image:</h2>
+                  <img
+                    src={imageProcessedPreview()}
+                    alt="Processed image preview"
+                  />
+                </div>
             </div>
           </div>
         </div>
