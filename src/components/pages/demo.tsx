@@ -92,11 +92,14 @@ export default function Demo(): JSX.Element {
                 />
               </div>
               <Show
-                when={isProcessing()}
+                when={!isProcessing()}
+                fallback={(
+                  <div class="text-lg mt-2">
+                    Processing image...
+                  </div>
+                )}
               >
-                <div>Processing image...</div>
-              </Show>
-              <div
+                <div
                   class={imageProcessedPreview() ? 'block' : 'hidden'}
                 >
                   <h2>Processed Image:</h2>
@@ -105,6 +108,7 @@ export default function Demo(): JSX.Element {
                     alt="Processed image preview"
                   />
                 </div>
+              </Show>
             </div>
           </div>
         </div>
