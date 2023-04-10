@@ -31,7 +31,14 @@ export default function Demo(): JSX.Element {
     const file = (event.target as HTMLInputElement).files?.[0];
 
     if (file) {
-      setImageBuffer(file);
+      // 1mb limit
+      if(file.size > 1048576 ){
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        alert("File is too big! Please upload a file smaller than 1MB.");
+     } else {
+       setImageBuffer(file);
+     };
     }
   };
 
@@ -73,11 +80,14 @@ export default function Demo(): JSX.Element {
           <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
             <div class="text-center mb-4">
               <label class="block text-gray-700 text-lg font-semibold">Upload an image</label>
+              <span class="text-gray-500 text-sm">
+                (PNG or JPG, 1MB max)
+              </span>
             </div>
             <div class="flex justify-center items-center mb-4">
               <input 
                 type="file"
-                accept="image/*"
+                accept="image/png,image/jpeg"
                 onInput={handleImageUpload}
               />
             </div>
@@ -94,7 +104,7 @@ export default function Demo(): JSX.Element {
               <Show
                 when={!isProcessing()}
                 fallback={(
-                  <div class="text-lg mt-2">
+                  <div class="text-lg font-medium text-gray-800 mt-4">
                     Processing image...
                   </div>
                 )}
