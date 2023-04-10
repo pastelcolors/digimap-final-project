@@ -11,7 +11,7 @@ export default defineConfig({
   integrations: [tailwind(), solidJs()],
   vite: {
     plugins: [thalerPlugin.vite({
-      origin: 'http://localhost:3000',
+      origin: 'https://digimap-final-project.vercel.app/',
       mode: 'server'
     })]
   }
