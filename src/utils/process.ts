@@ -41,9 +41,8 @@ export async function segment(imageBuffer: Uint8Array): Promise<Buffer> {
   }
 
   const img = await Jimp.read(Buffer.from(imageBuffer));
-  console.log(img);
   const imgGray = img.clone().greyscale();
-
+  
   imgGray.scan(0, 0, imgGray.bitmap.width, imgGray.bitmap.height, (x, y, idx) => {
     const grayValue = imgGray.bitmap.data[idx];
     pixelsFrequency[grayValue]++;
@@ -54,8 +53,12 @@ export async function segment(imageBuffer: Uint8Array): Promise<Buffer> {
 
   const res = imgGray.clone();
   res.scan(0, 0, res.bitmap.width, res.bitmap.height, (x, y, idx) => {
-    const grayValue = res.bitmap.data[idx];
-    res.bitmap.data[idx] = grayValue > opThres ? 255 : 0;
+    const grayValue = res.bitmap.data[idx]; // R channel
+    const newColor = grayValue > opThres ? 0 : 255;
+
+    res.bitmap.data[idx] = newColor; // R channel
+    res.bitmap.data[idx + 1] = newColor; // G channel
+    res.bitmap.data[idx + 2] = newColor; // B channel
   });
 
   return await res.getBufferAsync(Jimp.MIME_PNG);
