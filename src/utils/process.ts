@@ -2,22 +2,25 @@ import Jimp from 'jimp';
 
 export async function segment(imageBuffer: Uint8Array): Promise<Buffer> {
   const thresholdValues: { [key: number]: number } = {};
-  const pixelsFrequency: number[] = Array(256).fill(0);
+  const pixelsFrequency: number[] = [1];
 
   function calcWeight(startPixel: number, endPixel: number): number {
-    return pixelsFrequency.slice(startPixel, endPixel).reduce((acc, freq) => acc + freq, 0);
+    return pixelsFrequency.slice(startPixel, endPixel).reduce((a, b) => a + b, 0);
   }
 
   function calcVariance(startPixel: number, endPixel: number): number {
     const weight = calcWeight(startPixel, endPixel);
-    const mean = weight !== 0
-      ? pixelsFrequency.slice(startPixel, endPixel).reduce((acc, freq, i) => acc + (i + startPixel) * freq, 0) / weight
-      : 0;
+    const mean = weight === 0
+      ? 0
+      : pixelsFrequency
+          .slice(startPixel, endPixel)
+          .map((val, i) => (i + startPixel) * val)
+          .reduce((a, b) => a + b, 0) / weight;
 
-    const variance = pixelsFrequency.slice(startPixel, endPixel).reduce((acc, freq, i) => {
-      const diff = (i + startPixel) - mean;
-      return acc + (diff * diff) * freq;
-    }, 0) / weight;
+    const variance = pixelsFrequency
+      .slice(startPixel, endPixel)
+      .map((val, i) => ((i + startPixel) - mean) ** 2 * val)
+      .reduce((a, b) => a + b, 0) / weight;
 
     return variance;
   }
@@ -40,23 +43,21 @@ export async function segment(imageBuffer: Uint8Array): Promise<Buffer> {
     }
   }
 
-  const img = await Jimp.read(Buffer.from(imageBuffer));
-  console.log(img);
-  const imgGray = img.clone().greyscale();
+  const image = await Jimp.read(imageBuffer);
+  const grayImage = image.clone().greyscale();
 
-  imgGray.scan(0, 0, imgGray.bitmap.width, imgGray.bitmap.height, (x, y, idx) => {
-    const grayValue = imgGray.bitmap.data[idx];
-    pixelsFrequency[grayValue]++;
+  const histogram = new Array(256).fill(0);
+  grayImage.scan(0, 0, grayImage.bitmap.width, grayImage.bitmap.height, (x, y, idx) => {
+    const pixelValue = grayImage.bitmap.data[idx];
+    histogram[pixelValue]++;
   });
 
-  threshold(pixelsFrequency);
-  const opThres = Object.keys(thresholdValues).reduce((a, b) => (thresholdValues[+a] < thresholdValues[+b] ? +a : +b));
+  threshold(histogram);
+  const opThres = Object.keys(thresholdValues).reduce((a, b) => (thresholdValues[a] < thresholdValues[b] ? a : b));
 
-  const res = imgGray.clone();
-  res.scan(0, 0, res.bitmap.width, res.bitmap.height, (x, y, idx) => {
-    const grayValue = res.bitmap.data[idx];
-    res.bitmap.data[idx] = grayValue > opThres ? 255 : 0;
+  grayImage.scan(0, 0, grayImage.bitmap.width, grayImage.bitmap.height, (x, y, idx) => {
+    grayImage.bitmap.data[idx] = grayImage.bitmap.data[idx] > Number(opThres) ? 255 : 0;
   });
 
-  return await res.getBufferAsync(Jimp.MIME_PNG);
+  return await grayImage.getBufferAsync(Jimp.MIME_PNG);
 }
