@@ -2,7 +2,7 @@ import Jimp from 'jimp';
 
 export async function segment(imageBuffer: Uint8Array): Promise<Buffer> {
   const thresholdValues: { [key: number]: number } = {};
-  const pixelsFrequency: number[] = [1];
+  const pixelsFrequency: number[] = new Array(256).fill(0);
 
   function calcWeight(startPixel: number, endPixel: number): number {
     return pixelsFrequency.slice(startPixel, endPixel).reduce((a, b) => a + b, 0);
@@ -28,7 +28,7 @@ export async function segment(imageBuffer: Uint8Array): Promise<Buffer> {
   function threshold(pixelsFrequency: number[]): void {
     const nonzeroPixelsCount = pixelsFrequency.filter(pixel => pixel > 0).length;
 
-    for (let pixelValue = 1; pixelValue < pixelsFrequency.length; pixelValue++) {
+    for (let pixelValue = 1; pixelValue < pixelsFrequency.length; pixelValue++) { //?
       const varianceBackground = calcVariance(0, pixelValue);
       const weightBackground = calcWeight(0, pixelValue) / nonzeroPixelsCount;
 
