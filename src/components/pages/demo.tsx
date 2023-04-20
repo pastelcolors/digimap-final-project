@@ -81,7 +81,7 @@ export default function Demo(): JSX.Element {
             <div class="container px-3 py-4 text-center mb-4 bg-yellow-300 rounded-md flex-col">
               <div class="flex justify-start items-center gap-2">
                 <span class="block text-gray-900 text-base font-bold">Image segmentation using Otsu's Thresholding.</span>
-                <a href="https://mrinaltyagi24.medium.com/image-segmentation-part-1-9f3db1ac1c50" target="_blank" class='inline underline text-sm'>
+                <a href="https://ieeexplore.ieee.org/document/4310076" target="_blank" class='inline underline text-sm'>
                   Want to learn more about it?
                 </a>
               </div>
@@ -148,6 +148,12 @@ export default function Demo(): JSX.Element {
                     src={imageProcessedPreview()}
                     alt="Processed image preview"
                   />
+                  <div class="container flex flex-col items-center">
+                  <a href={imageProcessedPreview()} download="processed_image" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 my-2 px-4 rounded inline-flex items-center">
+                  <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
+                    Download
+                  </a>
+                  </div>
                 </div>
               </Show>
             </div>
