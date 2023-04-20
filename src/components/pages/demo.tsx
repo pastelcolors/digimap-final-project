@@ -103,12 +103,14 @@ export default function Demo(): JSX.Element {
               <span class="text-lg font-bold text-gray-900">How?</span> Done by identifying regions of interest within the image, separating them from the background or noise, and grouping them into different categories based on their characteristics.
               </span>
             </div>
-            <div class="flex justify-center items-center mb-4 mt-4">
+            <div class="flex-col items-center justify-center mb-4 mt-8">
               <input 
                 type="file"
                 accept="image/png,image/jpeg"
                 onInput={handleImageUpload}
+                class="bg-gray-200 p-3 rounded-md"
               />
+              <h3 class="text-gray-500 text-xs">Due to limitations of the free tier of vercel.com, please upload PNG or JPG, 1MB max</h3>
             </div>
             <div class="flex justify-center items-cente gap-4">
                 <div
