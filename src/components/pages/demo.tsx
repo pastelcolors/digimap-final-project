@@ -1,5 +1,6 @@
 import { JSX, Show, Suspense, createEffect, createResource, createSignal, onCleanup } from 'solid-js';
 import { fn$ } from 'thaler';
+import composeClassnames from '../../utils/composeClassnames';
 
 export default function Demo(): JSX.Element {
   const [imageBuffer, setImageBuffer] = createSignal<File | null>(null);
@@ -75,32 +76,55 @@ export default function Demo(): JSX.Element {
   return (
     <div class="bg-gray-100 min-h-screen">
       <div class="container mx-auto py-12">
-        <h1 class="text-center text-4xl font-semibold mb-6">Image Processing Demo</h1>
         <div class="flex justify-center items-center">
-          <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-            <div class="text-center mb-4">
-              <label class="block text-gray-700 text-lg font-semibold">Upload an image</label>
-              <span class="text-gray-500 text-sm">
+          <div class="container max-w-4xl w-full bg-white p-6 rounded-lg shadow-md">
+            <div class="container px-3 py-4 text-center mb-4 bg-yellow-300 rounded-md flex-col">
+              <div class="flex justify-start items-center gap-2">
+                <span class="block text-gray-900 text-base font-bold">Image segmentation using Otsu's Thresholding.</span>
+                <a href="https://mrinaltyagi24.medium.com/image-segmentation-part-1-9f3db1ac1c50" target="_blank" class='inline underline text-sm'>
+                  Want to learn more about it?
+                </a>
+              </div>
+              {/* <span class="text-gray-500 text-sm">
                 (PNG or JPG, 1MB max)
+              </span> */}
+            </div>
+            <div class='flex items-start gap-4'>
+              <div class='flex flex-col'>
+                <span class='text-sm text-gray-600'>
+                <span class="text-lg font-bold text-gray-900">What?</span> Image segmentation is the process of separating a digital image into multiple regions, where each region corresponds to a different part of the image.
+                </span>
+                <span class='text-sm text-gray-600'>
+
+                <span class="text-lg font-bold text-gray-900">Why?</span> The goal of image segmentation is to change the representation of an image that is easier to analyze.
+                </span>
+              </div>
+              <span class='text-sm text-gray-600'>
+              <span class="text-lg font-bold text-gray-900">How?</span> Done by identifying regions of interest within the image, separating them from the background or noise, and grouping them into different categories based on their characteristics.
               </span>
             </div>
-            <div class="flex justify-center items-center mb-4">
+            <div class="flex justify-center items-center mb-4 mt-4">
               <input 
                 type="file"
                 accept="image/png,image/jpeg"
                 onInput={handleImageUpload}
               />
             </div>
-            <div class="flex flex-col justify-center items-center">
-              <div
-                class={imagePreview() ? 'block' : 'hidden'}
-              >
-                <h2>Input Image:</h2>
-                <img 
-                  src={imagePreview()}
-                  alt="Uploaded image preview"
-                />
-              </div>
+            <div class="flex justify-center items-cente gap-4">
+                <div
+                  class={
+                    composeClassnames(
+                      imagePreview() ? 'block' : 'hidden',
+                      'bg-gray-200 p-4 rounded-md'
+                    )
+                  }
+                >
+                  <h2 class="text-center text-md">Input Image:</h2>
+                  <img 
+                    src={imagePreview()}
+                    alt="Uploaded image preview"
+                  />
+                </div>
               <Show
                 when={!isProcessing()}
                 fallback={(
@@ -110,9 +134,14 @@ export default function Demo(): JSX.Element {
                 )}
               >
                 <div
-                  class={imageProcessedPreview() ? 'block' : 'hidden'}
+                  class={
+                    composeClassnames(
+                      imageProcessedPreview() ? 'block' : 'hidden',
+                      'bg-gray-200 p-4 rounded-md'
+                    )
+                  }
                 >
-                  <h2>Processed Image:</h2>
+                  <h2 class="text-center text-md">Processed Image:</h2>
                   <img
                     src={imageProcessedPreview()}
                     alt="Processed image preview"
